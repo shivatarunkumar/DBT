@@ -19,7 +19,7 @@ sources:
                   
   - name: flattendatalayer
     tables:
-      - name: CustomerCreateFinal
+      - name: CustomerCreateFlattendata
         description: "Raw json is parsed from source table and transafomed into final flatten table"
         columns:
           - name: guid
