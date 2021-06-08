@@ -1,0 +1,33 @@
+{% set partitions_to_replace = [
+  'date(current_date)',
+  'date(date_sub(current_date, interval 0 day))'
+] %}
+
+{{
+    config(
+        materialized='incremental',
+        unique_key='guid',
+        incremental_strategy = 'insert_overwrite',
+        partition_by = {'field': 'created_date', 'data_type': 'date'},
+        partitions = partitions_to_replace
+    )
+}}
+
+with customer_flatten_data as (
+SELECT 
+customer.name as customer_name,
+customer.gender as customer_gender,
+customer.phone as customer_phone,
+customer.email as customer_email,
+balance as eod_balance,
+guid as guid,
+current_date() as created_date,
+current_timestamp() as created_time
+FROM {{ source( 'sourcelayer','CustomerCreateRaw')}} 
+
+{% if is_incremental() %}
+        -- recalculate yesterday + today
+        where date(created_date) in ({{ partitions_to_replace | join(',') }})
+    {% endif %}
+),
+

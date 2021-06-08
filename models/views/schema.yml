@@ -1,0 +1,50 @@
+
+version: 2
+
+sources:
+  - name: sourcelayer
+    tables:
+      - name: CustomerCreateRaw
+        description: "this table has all the raw data from the source system"
+        columns:
+            - name: messageid
+              tests:
+                  - not_null
+            - name: balance
+              tests:
+                  - not_null
+            - name: customer
+              tests: 
+                  - not_null
+                  
+  - name: flattendatalayer
+    tables:
+      - name: CustomerCreateFinal
+        description: "Raw json is parsed from source table and transafomed into final flatten table"
+        columns:
+          - name: guid
+            tests:
+                - not_null
+                - unique
+          - name: customer_name
+            tests:
+                - not_null  
+          - name : customer_gender
+            tests:
+                - not_null
+          - name: customer_phone
+            tests:
+                - not_null
+          - name: customer_email
+            meta:
+                sensitive: true
+            tests:
+                - not_null
+
+
+  - name : demotable 
+    tables:
+      - name: Test
+      - name: department
+      - name: dept-gsb
+      
