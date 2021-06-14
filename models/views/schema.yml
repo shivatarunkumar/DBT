@@ -5,7 +5,7 @@ sources:
   - name: sourcelayer
     tables:
       - name: CustomerCreateRaw
-        description: "this table has all the raw data from the source system"
+        description: "This table has all the raw data  in the form of JOSN received from the source system"
         columns:
             - name: messageid
               tests:
@@ -20,13 +20,16 @@ sources:
   - name: flattendatalayer
     tables:
       - name: CustomerCreateFlattendata
-        description: "Raw json is parsed from source table and transafomed into final flatten table"
+        description: "Raw json from the Source table is parsed and transafomed into final flatten table"
         columns:
           - name: guid
+            description: this column acts like primary key of the table
             tests:
                 - not_null
                 - unique
           - name: customer_name
+            description: customer full name is stored in this column
+            type: String
             tests:
                 - not_null  
           - name : customer_gender
