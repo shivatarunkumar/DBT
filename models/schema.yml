@@ -1,0 +1,69 @@
+
+version: 2
+
+sources:
+  - name: curateddatalayer
+    tables:
+      - name: dim_accounts
+        description: "dimention table for accounts"
+        columns:
+          - name: account_id
+            tests:
+                - not_null
+                - unique
+                - relationships:
+                    to: source('flattendatalayer','AccountsCreated')
+                    field: account_id
+
+      - name: dim_products
+        description: "This table holds curated data for products"
+        columns:
+          - name: product_id
+            tests:
+                - not_null
+                - unique
+          - name: display_name
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Overdraft Account']
+
+      - name: dim_customers
+        description: "customer info table"
+        columns:
+          - name: customer_id
+            tests:
+                - not_null
+      - name: dim_balances
+      - name: dim_customerdetails
+        description: "some more details of the customer"
+        columns: 
+          - name: customer_id
+            tests:
+              - relationships:
+                  to: ref('dim_customers')
+                  field: customer_id
+
+  - name: rawdatalayer
+    tables:
+      - name: src_accounts_created
+        description: "This table holds all  accounts data received from source system"
+      - name: src_balances_created
+        description: "This table holds all  Balance data received from source system"
+      - name: src_customers_created
+        description: "This table holds all  Customer data received from source system"
+      - name: src_products_created
+        description: "This table holds all  Products data received from source system"
+
+  - name: flattendatalayer
+    tables:
+      - name: AccountsCreated
+        description: "This table holds all  accounts data received from source system"
+      - name: BalancesCreated
+        description: "This table holds all  Balance data received from source system"
+      - name: CustomersCreated
+        description: "This table holds all  Customer data received from source system"
+      - name: ProductsCreated
+        description: "This table holds all  Products data received from source system"
+     
+        
