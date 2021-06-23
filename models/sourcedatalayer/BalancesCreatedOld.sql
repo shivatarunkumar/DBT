@@ -21,5 +21,3 @@ bookedBal.amount.amount as booked_amount,
 bookedBal.amount.currency as currency,
 availBal.date_time as last_value_timestamp
 from balance_created
-inner join {{ref('AccountsCreated')}} account_info 
-on account_info.account_id = bookedBal.account_id

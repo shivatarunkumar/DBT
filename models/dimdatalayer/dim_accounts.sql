@@ -5,6 +5,8 @@ schema='curateddatalayer'
 )
 }}
 
+
+
 SELECT
     'cc647baca88ed0045f4e3bdabe733a4b' as sk
   , opening_time as valid_from
@@ -20,5 +22,5 @@ SELECT
   , authorised_overdraft
   , stakeholder_id
   , 'vault' as source_system_identifier
-FROM {{ref('AccountsCreated')}}
+FROM {{ref('AccountsCreated')}} 
 where product_id='89'

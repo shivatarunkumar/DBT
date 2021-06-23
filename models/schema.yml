@@ -2,19 +2,40 @@
 version: 2
 
 sources:
+
   - name: curateddatalayer
     tables:
       - name: dim_accounts
         description: "dimention table for accounts"
         columns:
+          - name: sk
+            tests:
+              - not_null
+          - name: valid_from
+          - name: valid_to
+          - name: is_active
           - name: account_id
             tests:
                 - not_null
-                - unique
                 - relationships:
                     to: source('flattendatalayer','AccountsCreated')
                     field: account_id
-
+          - name: bank_id 
+          - name: product_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','AccountsCreated')
+                    field: product_id
+          - name: account_status
+          - name: account_opened_at
+          - name: authorised_overdraft
+          - name: stakeholder_id
+          - name: source_system_identifier
+            tests:
+              - not_null 
+              - accepted_values:
+                  values: ['vault','CBS']
       - name: dim_products
         description: "This table holds curated data for products"
         columns:
@@ -27,43 +48,122 @@ sources:
               - not_null
               - accepted_values:
                   values: ['Overdraft Account']
-
+          - name: product_family
+          - name: product_type
+          - name: default_currency
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['GBP']          
       - name: dim_customers
-        description: "customer info table"
+        description: "Customer info table"
         columns:
+          - name: sk
+            tests:
+              - not_null
+          - name: valid_from
+          - name: valid_to
+          - name: is_active
           - name: customer_id
             tests:
                 - not_null
-      - name: dim_balances
-      - name: dim_customerdetails
-        description: "some more details of the customer"
-        columns: 
-          - name: customer_id
+          - name: type
+          - name: status
+          - name: business_name
+          - name: business_start_date
+          - name: company_registration_number
+          - name: date_of_incorporation
+          - name: country_of_incorporation
+          - name: business_address
+          - name: contact_details
+          - name: number_of_employees
+          - name: expected_turnover
+          - name: source_system_identifier
             tests:
-              - relationships:
-                  to: ref('dim_customers')
-                  field: customer_id
-
-  - name: rawdatalayer
-    tables:
-      - name: src_accounts_created
-        description: "This table holds all  accounts data received from source system"
-      - name: src_balances_created
-        description: "This table holds all  Balance data received from source system"
-      - name: src_customers_created
-        description: "This table holds all  Customer data received from source system"
-      - name: src_products_created
-        description: "This table holds all  Products data received from source system"
+              - not_null 
+              - accepted_values:
+                  values: ['vault','CBS']
+      - name: dim_balances
+        description: " fact balance table"
+        columns:
+          - name: account_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','BalancesCreated')
+                    field: account_id  
+          - name: available_crdr_indicator
+          - name: available_amount      
+          - name: booked_crdr_indicator
+          - name: booked_amount
+          - name: currency
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['GBP']
+          - name: last_value_timestamp
+          - name: source_system_identifier
+            tests:
+              - not_null 
+              - accepted_values:
+                  values: ['vault','CBS']
 
   - name: flattendatalayer
     tables:
       - name: AccountsCreated
-        description: "This table holds all  accounts data received from source system"
+        columns:
+          - name: account_id
+            tests:
+              - not_null
+          - name: product_name
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Overdraft Account']          
+          - name: account_status
+          - name: nick_name
+          - name: stakeholder_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','CustomerCreated')
+                    field: customer_id            
+          - name: permitted_denominations
+          - name: account_created
+          - name: product_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','ProductsCreated')
+                    field: product_id  
+          - name: product_version_id
+          - name: statement_frequency
+          - name: tside
+          - name: opening_time
+          - name: account_updated
+          - name: authorised_overdraft 
       - name: BalancesCreated
-        description: "This table holds all  Balance data received from source system"
+        columns:
+          - name: account_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','AccountsCreated')
+                    field: account_id   			
+          - name: available_crdr_indicator			
+          - name: available_amount			
+          - name: booked_crdr_indicator			
+          - name: booked_amount			
+          - name: last_value_timestamp		
       - name: CustomersCreated
-        description: "This table holds all  Customer data received from source system"
       - name: ProductsCreated
-        description: "This table holds all  Products data received from source system"
-     
+
+  - name: rawdatalayer
+    tables:
+      - name: src_accounts_created
+      - name: src_balances_created
+      - name: src_customers_created
+      - name: src_products_created
+
+      
         
