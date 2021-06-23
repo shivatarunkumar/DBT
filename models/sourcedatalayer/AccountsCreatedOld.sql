@@ -4,23 +4,13 @@ materialized='table',
 schema='flattendatalayer')
 }}
 
- 
 
 with actOpt as (
 SELECT ao.key as ao_key,ao.value as ao_value,account_id as ao_accountId
  FROM {{ source('rawdatalayer', 'src_accounts_created') }},
  unnest(account_options) as ao
- where ao.key="authorised_overdraft" ),
+ where ao.key="authorised_overdraft" )
 
-customer_info as (
-  select distinct customer_id 
-  from {{ source('flattendatalayer','CustomersCreated')}}),
-
-product_info as (
-  select distinct product_id
-  from {{ source ('flattendatalayer','ProductsCreated')}}),
-
-account_info as (
 SELECT
       account_id
       , ARRAY_AGG(product_name IGNORE NULLS ORDER BY account_updated DESC)[OFFSET(0)] AS product_name
@@ -38,23 +28,4 @@ SELECT
       , ARRAY_AGG(aop.ao_value IGNORE NULLS ORDER BY account_updated DESC)[OFFSET(0)] as authorised_overdraft
 FROM {{ source('rawdatalayer', 'src_accounts_created') }} account_info
 Join actOpt aop on account_info.account_id = aop.ao_accountId 
-GROUP BY account_id)
-
-SELECT  
-account_id
-,product_name
-,account_status
-,nick_name
-,stakeholder_id
-,permitted_denominations
-,account_created
-,account_info.product_id
-,product_version_id
-,statement_frequency
-,tside
-,opening_time
-,account_updated
-,authorised_overdraft
-from account_info 
-inner join customer_info on customer_info.customer_id = account_info.stakeholder_id
-inner join product_info on product_info.product_id = account_info.product_id
+GROUP BY account_id

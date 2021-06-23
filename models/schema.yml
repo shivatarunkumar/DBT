@@ -2,6 +2,7 @@
 version: 2
 
 sources:
+
   - name: curateddatalayer
     tables:
       - name: dim_accounts
@@ -24,7 +25,7 @@ sources:
             tests:
                 - not_null
                 - relationships:
-                    to: source('flattendatalayer','ProductsCreated')
+                    to: source('flattendatalayer','AccountsCreated')
                     field: product_id
           - name: account_status
           - name: account_opened_at
@@ -35,7 +36,6 @@ sources:
               - not_null 
               - accepted_values:
                   values: ['vault','CBS']
-
       - name: dim_products
         description: "This table holds curated data for products"
         columns:
@@ -55,7 +55,6 @@ sources:
               - not_null
               - accepted_values:
                   values: ['GBP']          
-
       - name: dim_customers
         description: "Customer info table"
         columns:
@@ -84,7 +83,6 @@ sources:
               - not_null 
               - accepted_values:
                   values: ['vault','CBS']
-
       - name: dim_balances
         description: " fact balance table"
         columns:
@@ -110,6 +108,55 @@ sources:
               - accepted_values:
                   values: ['vault','CBS']
 
+  - name: flattendatalayer
+    tables:
+      - name: AccountsCreated
+        columns:
+          - name: account_id
+            tests:
+              - not_null
+          - name: product_name
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['Overdraft Account']          
+          - name: account_status
+          - name: nick_name
+          - name: stakeholder_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','CustomerCreated')
+                    field: customer_id            
+          - name: permitted_denominations
+          - name: account_created
+          - name: product_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','ProductsCreated')
+                    field: product_id  
+          - name: product_version_id
+          - name: statement_frequency
+          - name: tside
+          - name: opening_time
+          - name: account_updated
+          - name: authorised_overdraft 
+      - name: BalancesCreated
+        columns:
+          - name: account_id
+            tests:
+                - not_null
+                - relationships:
+                    to: source('flattendatalayer','AccountsCreated')
+                    field: account_id   			
+          - name: available_crdr_indicator			
+          - name: available_amount			
+          - name: booked_crdr_indicator			
+          - name: booked_amount			
+          - name: last_value_timestamp		
+      - name: CustomersCreated
+      - name: ProductsCreated
 
   - name: rawdatalayer
     tables:
@@ -117,12 +164,6 @@ sources:
       - name: src_balances_created
       - name: src_customers_created
       - name: src_products_created
-      
-  - name: flattendatalayer
-    tables:
-      - name: AccountsCreated
-      - name: BalancesCreated
-      - name: CustomersCreated
-      - name: ProductsCreated
+
       
         
