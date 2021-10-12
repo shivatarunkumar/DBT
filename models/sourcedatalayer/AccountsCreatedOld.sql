@@ -26,6 +26,6 @@ SELECT
       , MAX(opening_time) AS opening_time
       , MAX(account_updated) AS account_updated
       , ARRAY_AGG(aop.ao_value IGNORE NULLS ORDER BY account_updated DESC)[OFFSET(0)] as authorised_overdraft
-FROM {{ source('rawdatalayer', 'src_accounts_created') }} account_info
+FROM {{ source('rawdatalayer2', 'src_accounts_created') }} account_info
 Join actOpt aop on account_info.account_id = aop.ao_accountId 
 GROUP BY account_id
